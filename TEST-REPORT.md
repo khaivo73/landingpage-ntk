@@ -58,3 +58,7 @@ Repository do người dùng tạo: https://github.com/khaivo73/landingpage-ntk.
 ## Blocker được xác minh khi tiếp tục
 
 Vercel team dmis đã đăng nhập và liệt kê được landingpage-ntk để import. GitHub get_repo trả quyền tài khoản push/admin=true, nhưng thao tác create_file trả 403 Resource not accessible by integration. Chưa có mã nguồn nào được ghi lên repository. Danh sách installations của kết nối hiện tại rỗng; cần cấp quyền kết nối GitHub của ChatGPT đối với repository và quyền ghi Contents, hoặc cung cấp một phương thức push được xác thực. Chưa có deployment.
+
+## Cập nhật triển khai
+
+Đã cấp quyền GitHub App, ghi source thành công. Main: db0d61cb15f3d2936370cc839b299a679f8977d7. Bản runtime Node24: a40c80b5173dac6d62eb19abd54dca065118fe37. Lint/typecheck/build/test:built đã chạy lại thành công. Vercel project dmis/landingpage-ntk đã nối Git và chọn Next.js/Node24. Lần build đầu hoàn thành ở Production trước khi yêu cầu hủy có hiệu lực; Production đã được pause. Nhánh preview sẽ tạo bản Preview tiếp theo. Các blocker quyền cũ ở trên đã được giải quyết.
