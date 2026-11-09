@@ -1,0 +1,29 @@
+[Unit]
+Description=VNPT fiber landing page
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vnpt-fiber
+Group=vnpt-fiber
+WorkingDirectory=/opt/vnpt-fiber/current
+EnvironmentFile=/etc/vnpt-fiber.env
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+Environment=PORT=3100
+Environment=NODE_OPTIONS=--max-old-space-size=384
+ExecStart=/opt/vnpt-node/bin/node server.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/vnpt-fiber/current/.next/cache
+UMask=0077
+MemoryMax=600M
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target
