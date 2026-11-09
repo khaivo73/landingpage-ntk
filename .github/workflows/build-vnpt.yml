@@ -28,6 +28,7 @@ jobs:
       - run: npm run build
       - name: Package runtime without credentials
         run: |
+          test -f .next/standalone/server.js
           cp -r public .next/standalone/public
           mkdir -p .next/standalone/.next/static
           cp -r .next/static/. .next/standalone/.next/static/

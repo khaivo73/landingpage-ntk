@@ -2,8 +2,10 @@
 # Installs isolated application only. Does not touch existing Apache sites or DNS.
 set -euo pipefail
 [ "$(id -u)" = 0 ] || { echo 'Run as root'; exit 1; }
-release=71de5dfc12924a445678d1230fce8419b5033f6f
-runtime_sha=12b16fc20dc2d88a266d5b82dc14f079c94e0f464e2186d5cea1e37fef8f70f1
+release=${1:?Supply verified release commit}
+runtime_sha=${2:?Supply verified SHA256}
+[[ "$release" =~ ^[a-f0-9]{40}$ ]]
+[[ "$runtime_sha" =~ ^[a-f0-9]{64}$ ]]
 node_version=v24.22.2
 work=$(mktemp -d /var/tmp/vnpt-install.XXXXXX)
 trap 'rm -rf "$work"' EXIT
@@ -27,6 +29,7 @@ if [ ! -d "/opt/vnpt-fiber/releases/$release" ]; then
   tar -xzf vnpt-runtime.tar.gz -C "/opt/vnpt-fiber/releases/$release" --no-same-owner
 fi
 app="/opt/vnpt-fiber/releases/$release"
+test -f "$app/server.js"
 mkdir -p "$app/.next/cache"
 chown -R vnpt-fiber:vnpt-fiber "$app/.next/cache"
 if [ -e /opt/vnpt-fiber/current ] && [ ! -L /opt/vnpt-fiber/current ]; then
@@ -37,8 +40,12 @@ if [ ! -e /etc/vnpt-fiber.env ]; then
   umask 077
   printf 'SUPABASE_URL=https://sktvegipvzngwsditzjx.supabase.co\nSUPABASE_SECRET_KEY=\nLEAD_IP_HASH_SECRET=%s\nSITE_URL=\nSITE_INDEXABLE=false\n' "$(openssl rand -hex 32)" > /etc/vnpt-fiber.env
 fi
-[ ! -e /etc/systemd/system/vnpt-fiber.service ] || { echo 'Service exists; review before replacing'; exit 1; }
-curl -fsSL "https://raw.githubusercontent.com/khaivo73/landingpage-ntk/$release/vnpt-fiber/deploy/vnpt-fiber.service" -o /etc/systemd/system/vnpt-fiber.service
+curl -fsSL "https://raw.githubusercontent.com/khaivo73/landingpage-ntk/$release/vnpt-fiber/deploy/vnpt-fiber.service" -o "$work/vnpt-fiber.service"
+if [ -e /etc/systemd/system/vnpt-fiber.service ]; then
+  cmp -s "$work/vnpt-fiber.service" /etc/systemd/system/vnpt-fiber.service || { echo "Different service exists; review required"; exit 1; }
+else
+  install -m 644 "$work/vnpt-fiber.service" /etc/systemd/system/vnpt-fiber.service
+fi
 systemctl daemon-reload
 systemctl enable --now vnpt-fiber
 for attempt in 1 2 3 4 5; do
