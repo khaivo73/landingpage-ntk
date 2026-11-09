@@ -1,6 +1,6 @@
 # Kiểm thử VNPT Fiber
 
-Ngày 09/11/2026, Asia/Saigon. Trạng thái: ứng dụng đã hoàn thiện cục bộ; chưa xác nhận lưu khách hàng thật hoặc triển khai thương mại.
+Ngày 10/11/2026, Asia/Saigon. Trạng thái: đã chạy VPS qua HTTPS tại https://internet.vnptcantho.io.vn. Chưa kích hoạt form; chưa xác nhận end-to-end nhận khách từ website.
 
 - npm run lint: PASS.
 - npm run typecheck: PASS.
@@ -13,4 +13,15 @@ Ngày 09/11/2026, Asia/Saigon. Trạng thái: ứng dụng đã hoàn thiện c�
 - Trang /chinh-sach-bao-mat hoạt động và có tiêu đề riêng.
 - Form chưa cấu hình database bị vô hiệu hóa, thông báo đúng chưa gửi/lưu.
 
-Chưa kiểm thử API end-to-end với Supabase thật, rate limit transactional thực tế, gửi lặp, quyền anon bằng kết nối live, hoặc khôi phục backup. SQL và API đã được chuẩn bị; cần project/secret để chạy các bước đó. Chưa chứng nhận WCAG, chưa chạy Lighthouse/thiết bị iOS/Android thật. SEO giữ noindex đến khi có URL Production chuẩn và được kích hoạt.
+## Xác minh trực tuyến 10/11/2026
+
+- Runtime commit bf108a7db38efc0730fa04de5e1bdb4c2d8cc89c; GitHub Actions run 42722265579 SUCCESS: lint, typecheck, 12 tests, production dependency audit, build và packaging.
+- VPS 42.96.17.168: Node 24.22.2, systemd user riêng, bind loopback 127.0.0.1:3100; Apache virtual host riêng. WordPress cũ giữ nguyên cấu hình.
+- HTTPS certificate được cấp cho internet.vnptcantho.io.vn, hết hạn 07/02/2027; Certbot renewal timer có sẵn, thêm deploy hook reload Apache.
+- HTTP chuyển hướng HTTPS; /, /robots.txt, /chinh-sach-bao-mat, /hero.webp đều HTTP 200; nosniff có mặt.
+- Chromium online desktop 1920px và mobile viewport 390x844: 7 section, 1 H1, 0 input/select thiếu label, ảnh tải đủ, không tràn ngang. Mobile menu mở và Escape đóng (DOM state).
+- API POST /api/leads khi chưa có secret trả 503 với thông báo đúng; giao diện form bị vô hiệu hóa. Không báo lưu thành công giả.
+- Supabase SQL transaction thực tế: gửi lại UUID chỉ 1 dòng, 5 đăng ký/IP/15 phút được nhận, lần 6 bị RATE_LIMIT. Rollback toàn bộ fixture, persisted_rows_after_rollback=0.
+- RLS bật; anon/authenticated không được đọc bảng; anon không được gọi RPC. Advisor chỉ INFO RLS-with-no-policy, có chủ đích vì bảng chỉ cho server service role.
+
+Còn thiếu: cấp quyền chuyển khóa server Supabase đến VPS, kiểm thử form end-to-end qua HTTPS, kiểm chứng hàng được lưu và gửi lặp từ API. Chưa chứng nhận WCAG, chưa chạy Lighthouse hoặc thiết bị iOS/Android thật; chưa diễn tập khôi phục backup. SEO giữ noindex đến khi kiểm thử cuối và kích hoạt chính thức.

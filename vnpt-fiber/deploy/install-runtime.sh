@@ -47,7 +47,8 @@ else
   install -m 644 "$work/vnpt-fiber.service" /etc/systemd/system/vnpt-fiber.service
 fi
 systemctl daemon-reload
-systemctl enable --now vnpt-fiber
+systemctl enable vnpt-fiber
+systemctl restart vnpt-fiber
 for attempt in 1 2 3 4 5; do
   if curl -fsS -o /dev/null http://127.0.0.1:3100/; then echo 'VNPT_RUNTIME_OK'; exit 0; fi
   sleep 2
