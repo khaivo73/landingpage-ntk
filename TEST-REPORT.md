@@ -1,64 +1,53 @@
-# Báo cáo kiểm thử — 09/11/2026 (Asia/Saigon)
+# Báo cáo bàn giao landing page Nguyễn Tất Kiểm
 
-Trạng thái: HOÀN THIỆN CỤC BỘ, CHƯA HOÀN TẤT TRIỂN KHAI.
+Ngày kiểm thử: 09/11/2026, Asia/Saigon.
 
-## Kiểm thử đã chạy
+## URL và mã nguồn
 
-| Hạng mục | Kết quả / bằng chứng |
+- Preview theo nhánh: https://landingpage-ntk-git-preview-dmis.vercel.app
+- Deployment đã xác minh Ready: https://landingpage-6si5hsgz2-dmis.vercel.app
+- Vercel deployment: https://vercel.com/dmis/landingpage-ntk/eB1VzooHAE6Vo68vLXUCBkZ2tzzH
+- Repository: https://github.com/khaivo73/landingpage-ntk
+- Nhánh: preview
+- Commit đã kiểm thử online: 8b6dddd5f76cd58393bd493fcb5e034fc926b891
+- Runtime/code commit: a40c80b5173dac6d62eb19abd54dca065118fe37
+- Commit bàn giao tài liệu sau đó chỉ thay README và báo cáo này; không đổi mã ứng dụng.
+
+## Kết quả
+
+| Kiểm thử | Kết quả |
 | --- | --- |
-| Dependencies | npm install thành công, có package-lock.json |
-| Lint | npm run lint: không lỗi/cảnh báo ở mã nguồn cuối |
-| TypeScript | npm run typecheck: thành công |
-| Production build | npm run build: Next.js 15.5.29, 6 trang static tạo thành công; route / khoảng 12.3 kB, first-load JS 115 kB |
-| Production HTML | npm run test:built: 7 section, một H1, vi, Open Graph, noindex, thông báo demo; không có name trên input/select, submit disabled trước hydration |
-| Dependencies production | npm audit --omit=dev --audit-level=high: 0 vulnerabilities sau override PostCSS 8.5.32 |
-| Desktop | Chromium, viewport CSS rộng 1363px: Hero hiển thị, điều hướng và form có bố cục hai cột; không tràn ngang |
-| Responsive | CSS viewport 545px và 340px qua browser zoom: không tràn ngang, card về một cột; ở 340px course column 305px |
-| Menu mobile | Mở/đóng; aria-expanded chuyển; Escape đóng; chọn Khóa học đóng menu và đi tới section |
-| FAQ | Nhấn chuột mở câu hỏi; bàn phím Enter đổi aria-expanded; vùng trả lời có id và aria-labelledby |
-| Form | Trường trống bị browser validation chặn; phone 123 bị pattern chặn; dữ liệu giả hợp lệ được reset và báo không gửi/lưu |
-| Liên kết | 0 liên kết neo thiếu đích |
-| Accessibility cơ bản | 0 ảnh thiếu alt, 0 input/select thiếu label, focus-visible, skip link, reduced-motion, lang=vi |
-| SEO preview | title/description, Open Graph, viewport, icon, noindex/nofollow; không bịa structured data về chuyên gia hoặc đánh giá |
+| Dependencies | Có lockfile; Next.js 15.5.29, React 19, Node 24.x |
+| ESLint | PASS, không lỗi mã nguồn |
+| TypeScript | PASS |
+| Production build cục bộ | PASS; tạo 6 trang static; route / 12.3 kB, first-load JS 115 kB |
+| Production HTML regression | PASS: đủ 7 section, 1 H1, lang vi, noindex, Open Graph, thông báo demo; không có name trên trường form; submit disabled trước hydration |
+| Audit production | npm audit --omit=dev --audit-level=high: 0 vulnerabilities; override PostCSS 8.5.32 |
+| Vercel build | Ready; môi trường Preview; build duration tổng 42 giây |
+| Desktop online | Chromium 1920px và 1440px: trang tải, bố cục hiển thị, không tràn ngang |
+| Tablet online | Viewport thật 768×1024: không tràn ngang |
+| Mobile online | Viewport thật 390×844 và 320×740: không tràn ngang, course card về một cột |
+| Menu mobile online | Mở/đóng, aria-expanded, Escape hoạt động |
+| FAQ online | Click mở câu hỏi, Enter đổi aria-expanded và vùng trả lời |
+| Form online | Dữ liệu giả hợp lệ: reset, báo không gửi/lưu, URL không thêm query; phone 123 tạo 1 input:invalid và không submit |
+| DOM/accessibility cơ bản | 7 section, 1 H1, 0 liên kết neo thiếu đích, 0 trường thiếu label; có skip link, focus-visible, alt, reduced-motion |
+| SEO preview | title, description, Open Graph, lang vi, viewport và favicon; noindex/nofollow, robots disallow |
+| Console online | 0 warning/error trong log Chromium thu được khi kiểm thử |
 
-## Lỗi phát hiện và sửa
+## Quyền truy cập và giới hạn kiểm thử
 
-- Lệnh preview truyền cờ kiểu Vite không tương thích Next: thêm wrapper chuyển --host sang --hostname và bỏ --strictPort.
-- ESLint ban đầu quét build output .next: thêm ignores cho output và file next-env sinh tự động.
-- Cảnh báo CSS align-items:end: đổi thành flex-end.
-- Dependency PostCSS có advisory: pin override 8.5.32; audit production về 0.
-- Ảnh AI trước đây chỉ được giải thích trong README: thêm nhãn trực tiếp trên trang.
-- Thiếu liên kết ARIA FAQ/menu, skip link và một số màu nhạt: đã cải thiện.
-- Trong kiểm thử tải trang, native form có thể gửi dữ liệu thử qua query string trước hydration. Đã bỏ name trên các trường và disable nút tới khi JS sẵn sàng; kiểm tra regression ngay trên HTML production.
+Preview bật bảo vệ đăng nhập Vercel. Tài khoản có quyền project mở và tương tác được. HTTP smoke từ shell chưa đăng nhập bị chuyển tới Login – Vercel; không tính kiểm thử này là PASS. Chưa kiểm thử đầy đủ HTTP assets/404 qua phiên xác thực.
 
-## Giới hạn cần ghi nhận
+Chưa kiểm thử iOS/Android thật hoặc Safari/Firefox. Accessibility là kiểm tra cơ bản và bàn phím; chưa chạy axe/Lighthouse hay screen reader, chưa chứng nhận WCAG đầy đủ. Chưa có số đo Core Web Vitals thực tế.
 
-- Responsive được thử bằng thay đổi chiều rộng CSS qua zoom, chưa kiểm thử thiết bị iOS/Android thật hoặc Safari/Firefox.
-- Accessibility mới kiểm tra cơ bản và bàn phím, chưa chứng nhận WCAG đầy đủ, chưa chạy axe/Lighthouse hoặc screen reader.
-- Chưa xác minh chân dung, hồ sơ chuyên gia, khóa học hoặc testimonial. Tất cả vẫn rõ trạng thái demo.
-- HTTP smoke từ shell đến preview bị ECONNREFUSED do môi trường preview ở bề mặt trình duyệt riêng. Trang được mở và tương tác được bằng Chromium. `test:smoke` dành cho URL được triển khai; chưa được tính là PASS.
-- Chưa có kết quả test URL Vercel, DNS/TLS, HTTP asset/404 và hành vi bản deployed. Chưa có URL trực tuyến để bàn giao.
+Vercel build có cảnh báo ESLint 9 hết thời gian hỗ trợ và cấu hình cache-dir của môi trường npm; không có lỗi build hoặc lỗi runtime ghi nhận. Giữ ESLint tương thích với Next.js 15; cần đánh giá nâng cấp major riêng.
 
-## Điều kiện tiếp tục
+## Nội dung và dữ liệu
 
-1. Đăng nhập GitHub trên tab đang mở (tài khoản khaivo73), hoặc cung cấp repository mới mà GitHub connector được cấp quyền ghi.
-2. Cài/kết nối Vercel trong ChatGPT và xác thực tài khoản/team đích.
-3. Tạo repo private, đẩy commit, triển khai Vercel Preview, kiểm tra URL thực tế và chạy `npm run test:smoke -- <URL>`.
+7 section hoàn chỉnh dựa trên ZIP gốc, không viết lại từ đầu. Không công bố thành tích, đối tác hay testimonial giả. Khóa học và phản hồi có nhãn demo/chờ xác minh. Ảnh hero có nhãn minh họa AI, chưa xác minh danh tính.
 
-Không báo hoàn thành toàn bộ trước khi bước 3 thành công.
+Form là DEMO, không backend, không fetch hoặc storage. Đã sửa nguy cơ native form tạo query trước hydration bằng cách bỏ name trên trường và khóa submit đến khi JS sẵn sàng. Khi JS tắt, nút vẫn disabled. Chỉ nhập dữ liệu thử.
 
-## Kiểm tra lại bản vá cuối
+## Trạng thái hosting
 
-Chromium tải URL sạch: nút demo disabled ban đầu, enabled sau hydration; 0 trường có name. Gửi dữ liệu giả hợp lệ: URL vẫn là http://127.0.0.1:4173/ (không query); status báo không gửi/lưu; sửa dữ liệu làm status cũ biến mất. Bản vá đã được kiểm thử trực tiếp sau build cuối.
-
-## Cập nhật kết nối
-
-Repository do người dùng tạo: https://github.com/khaivo73/landingpage-ntk. GitHub xác nhận quyền push/admin. Phiên Vercel đã mở trong trình duyệt. Bước triển khai và kiểm thử online đang tiếp tục; các blocker mô tả trước đây là trạng thái lịch sử.
-
-## Blocker được xác minh khi tiếp tục
-
-Vercel team dmis đã đăng nhập và liệt kê được landingpage-ntk để import. GitHub get_repo trả quyền tài khoản push/admin=true, nhưng thao tác create_file trả 403 Resource not accessible by integration. Chưa có mã nguồn nào được ghi lên repository. Danh sách installations của kết nối hiện tại rỗng; cần cấp quyền kết nối GitHub của ChatGPT đối với repository và quyền ghi Contents, hoặc cung cấp một phương thức push được xác thực. Chưa có deployment.
-
-## Cập nhật triển khai
-
-Đã cấp quyền GitHub App, ghi source thành công. Main: db0d61cb15f3d2936370cc839b299a679f8977d7. Bản runtime Node24: a40c80b5173dac6d62eb19abd54dca065118fe37. Lint/typecheck/build/test:built đã chạy lại thành công. Vercel project dmis/landingpage-ntk đã nối Git và chọn Next.js/Node24. Lần build đầu hoàn thành ở Production trước khi yêu cầu hủy có hiệu lực; Production đã được pause. Nhánh preview sẽ tạo bản Preview tiếp theo. Các blocker quyền cũ ở trên đã được giải quyết.
+Team/project: dmis/landingpage-ntk; Next.js, Node24, root ./; Production branch main, Preview branch preview. Lần khởi tạo đầu của Vercel đã tạo thêm bản Production. Project đã được tạm dừng rồi mở lại vì pause cũng chặn build Preview. Bản bàn giao là URL Preview ở trên; project hiện hoạt động, không gắn domain riêng. Nội dung vẫn demo/noindex ở mọi môi trường.

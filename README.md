@@ -32,7 +32,8 @@ SEO preview giữ noindex/nofollow và robots disallow; chưa đặt canonical k
 - Vercel team/project: dmis/landingpage-ntk
 - Framework: Next.js; Node.js 24.x; root ./
 - Nhánh thử nghiệm: preview. Production branch: main.
-- Lần triển khai đầu tự được Vercel gán Production và đã hoàn thành trước khi yêu cầu hủy có hiệu lực. Production đã được pause; Preview deployments không bị ảnh hưởng theo thông báo Vercel.
-- Bản Preview tiếp theo được dựng từ nhánh preview. Kiểm tra trạng thái và URL thực tế trên Vercel trước khi bàn giao.
+- Preview URL: https://landingpage-ntk-git-preview-dmis.vercel.app
+- Preview được bảo vệ bằng đăng nhập Vercel. Mở bằng tài khoản có quyền truy cập project.
+- Project đang hoạt động. Vercel đã tạo một bản Production trong lần khởi tạo đầu; bản bàn giao và kiểm thử là Preview. Không gắn domain riêng; nội dung vẫn demo và noindex.
 
-Xem TEST-REPORT.md về kết quả và giới hạn kiểm thử cục bộ. Báo cáo online cuối được cung cấp trong bàn giao.
+Xem TEST-REPORT.md về kết quả kiểm thử, commit và giới hạn.
