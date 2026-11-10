@@ -1,39 +1,51 @@
-# Kiểm thử VNPT Fiber
+# Kiểm thử VNPT Fiber — 10/11/2026
 
-Ngày 10/11/2026, Asia/Saigon. Trạng thái: đã chạy VPS qua HTTPS tại https://internet.vnptcantho.io.vn. Chưa kích hoạt form; chưa xác nhận end-to-end nhận khách từ website.
+## Bản đang chạy
 
-- npm run lint: PASS.
-- npm run typecheck: PASS.
-- npm test: 12/12 PASS. Kiểm tra điện thoại, consent, khu vực, UUID, thời gian, trường quá dài, UTM, UTF-8, JSON lỗi và payload vượt 8 KiB.
-- npm run build: PASS. Next.js 15.5.29; route / server-rendered; 11.3 kB, first-load JS 117 kB; API /api/leads, trang bảo mật, icon, robots, sitemap.
-- npm audit --omit=dev --audit-level=high: 0 vulnerabilities.
-- Chromium desktop 1363px, tablet CSS 779px, mobile CSS 545px và 340px bằng zoom: không tràn ngang.
-- Menu mobile mở và Escape đóng; FAQ native details mở bằng Enter.
-- 7 section, 1 H1, lang vi; 0 neo không có đích; 0 input/select thiếu label; ảnh có alt; skip link và reduced-motion.
-- Trang /chinh-sach-bao-mat hoạt động và có tiêu đề riêng.
-- Form chưa cấu hình database bị vô hiệu hóa, thông báo đúng chưa gửi/lưu.
+- URL: https://internet.vnptcantho.io.vn/
+- Runtime commit: b35fcb8bfa81bd4191e5e97ae115827a5c04978e.
+- GitHub Actions 42783244713: SUCCESS — lint, typecheck, 13 unit tests, production dependency audit, production build, standalone packaging.
+- Next.js 15.5.29, Node 24.22.2, VPS 42.96.17.168; riêng service vnpt-fiber, lắng nghe 127.0.0.1:3100 và Apache HTTPS proxy.
+- 4 gói HOME1 Mesh, CAM CANH, CAM MẬT, CAM SÀNH; giá/quyền lợi theo ảnh chủ website cung cấp. Tên CAM MẬT đã sửa theo xác nhận của chủ website.
 
-## Xác minh trực tuyến 10/11/2026
+## Form thực tế — PASS
 
-- Runtime commit bf108a7db38efc0730fa04de5e1bdb4c2d8cc89c; GitHub Actions run 42722265579 SUCCESS: lint, typecheck, 12 tests, production dependency audit, build và packaging.
-- VPS 42.96.17.168: Node 24.22.2, systemd user riêng, bind loopback 127.0.0.1:3100; Apache virtual host riêng. WordPress cũ giữ nguyên cấu hình.
-- HTTPS certificate được cấp cho internet.vnptcantho.io.vn, hết hạn 07/02/2027; Certbot renewal timer có sẵn, thêm deploy hook reload Apache.
-- HTTP chuyển hướng HTTPS; /, /robots.txt, /chinh-sach-bao-mat, /hero.webp đều HTTP 200; nosniff có mặt.
-- Chromium online desktop 1920px và mobile viewport 390x844: 7 section, 1 H1, 0 input/select thiếu label, ảnh tải đủ, không tràn ngang. Mobile menu mở và Escape đóng (DOM state).
-- API POST /api/leads khi chưa có secret trả 503 với thông báo đúng; giao diện form bị vô hiệu hóa. Không báo lưu thành công giả.
-- Supabase SQL transaction thực tế: gửi lại UUID chỉ 1 dòng, 5 đăng ký/IP/15 phút được nhận, lần 6 bị RATE_LIMIT. Rollback toàn bộ fixture, persisted_rows_after_rollback=0.
-- RLS bật; anon/authenticated không được đọc bảng; anon không được gọi RPC. Advisor chỉ INFO RLS-with-no-policy, có chủ đích vì bảng chỉ cho server service role.
+1. Tải website công khai, chọn CAM MẬT trên thẻ gói; form điền sẵn đúng lựa chọn.
+2. Điền tên thử, điện thoại thử, Bình Thủy, địa chỉ thử và đồng ý liên hệ.
+3. Bấm Nhận tư vấn gói cước; giao diện báo đang gửi rồi xác nhận Đã nhận nhu cầu tư vấn.
+4. Form được reset sau thành công, nút gửi trở lại hoạt động.
+5. Kiểm chứng bản ghi 4120c68e-1b66-4515-ab66-8c545f6e1f49 trong Supabase: gói CAM MẬT, Bình Thủy, nguồn system_qa, có consent_at.
+6. GET trang chủ HTTP 200; không còn thông báo chờ kích hoạt, các ô nhập cho phép thao tác.
 
-Còn thiếu: cấp quyền chuyển khóa server Supabase đến VPS, kiểm thử form end-to-end qua HTTPS, kiểm chứng hàng được lưu và gửi lặp từ API. Chưa chứng nhận WCAG, chưa chạy Lighthouse hoặc thiết bị iOS/Android thật; chưa diễn tập khôi phục backup. SEO giữ noindex đến khi kiểm thử cuối và kích hoạt chính thức.
+## API trực tuyến — PASS
 
-## Bổ sung 4 gói cước — 10/11/2026
+- Đăng ký hợp lệ: 200, reference đúng UUID.
+- Gửi lại cùng UUID: 200; truy vấn database xác nhận duy nhất 1 dòng.
+- Điện thoại sai, thiếu đồng ý, tên gói lạ: 400.
+- Origin ngoài website: 403.
+- Content-Type không phải JSON: 415.
+- JSON hỏng: 400.
+- Body vượt 8 KiB: 413.
+- Honeypot có nội dung: 400.
+- Timestamp ở tương lai: 400.
 
-Nguồn nội dung: ảnh tờ giới thiệu VNPT Cần Thơ do chủ website cung cấp trong hội thoại. HOME1 Mesh 215.000đ/tháng, CAM CANH 200.000đ/tháng, CAM MẬT 190.000đ/tháng, CAM SÀNH 205.000đ/tháng. Không tự thêm khuyến mãi/VAT/điều kiện chưa xác minh.
+Lưu ý kiểm thử: ngưỡng gửi tối thiểu 1,2 giây được kiểm tra bằng unit test với đồng hồ cố định. Không dùng thời gian gửi qua Internet để kết luận ngưỡng này, vì độ trễ mạng có thể vượt 1,2 giây.
 
-- Thêm thẻ giá và quyền lợi, nút Chọn gói, trạng thái gói đã chọn và chọn sẵn trường Gói cước / nhu cầu. Cùng trạng thái React cho thẻ và form.
-- Lựa chọn gửi qua trường demand hiện có và được API chuyển vào payload Supabase; không cần thay schema.
-- Lint, typecheck, production build PASS; 13/13 unit tests PASS, gồm chấp nhận 4 tên gói và từ chối tên lạ.
-- Chromium preview desktop 1363px: 4 thẻ, không tràn ngang; chọn HOME1 Mesh, CAM CANH, CAM MẬT bằng chuột và CAM SÀNH bằng Enter xác nhận trường demand và thẻ được chọn đúng. Chỉ 1 thẻ được đánh dấu tại một thời điểm.
-- CSS đặt 2 cột dưới 1100px và 1 cột dưới 560px; chưa kiểm thử lại viewport mobile cho lần cập nhật này.
-- Bản gói cước chưa lên VPS; cần thực thi installer của release mới qua SSH. Form production vẫn chờ cấu hình secret; không tuyên bố end-to-end thành công.
-- deploy/activate-leads.sh hỗ trợ quản trị viên nhập khóa server qua SSH với input ẩn, xác thực API quyền đọc limit=0 trước khi ghi file quyền 600; không đưa secret vào command arguments hay Git.
+## Lưu trữ và quyền truy cập — PASS
+
+- VPS gọi Edge Function vnpt-lead-intake bằng khóa riêng chỉ dùng cho đầu nhận đăng ký. Khóa được nhập ẩn, không ghi shell history, không có trong Git hoặc frontend; file môi trường quyền 600.
+- Function xác thực SHA-256 của khóa, kiểm tra payload có giới hạn, chỉ gọi RPC submit_vnpt_lead. Khóa quản trị database chỉ được dùng trong môi trường Supabase.
+- Gọi trực tiếp function không có khóa: 401 UNAUTHORIZED.
+- Bản thử qua function 9faafc38-9125-4c88-97cc-06efceba8ac4 lưu đúng CAM MẬT.
+- Bảng bật RLS; anon/authenticated không có quyền SELECT; anon không có quyền EXECUTE RPC. Không cung cấp API liệt kê khách hàng công khai.
+- RPC giới hạn 5 đăng ký/IP băm/15 phút, khóa giao dịch chống race; kiểm thử SQL trước đó đã xác minh lần thứ 6 bị RATE_LIMIT và UUID lặp không tăng dòng.
+- Advisor không có cảnh báo bảo mật WARN/ERROR; INFO RLS-with-no-policy có chủ đích vì bảng chỉ dành cho service role. [Giải thích advisor](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy).
+- 3 bản ghi QA của phiên này giữ trạng thái closed, ghi chú KHÔNG LIÊN HỆ; không nằm trong danh sách khách mới. Không xóa dữ liệu khách hàng thật.
+
+## Giao diện và SEO
+
+- Desktop Chromium 1363px: 4 thẻ, không tràn ngang; chọn gói và gửi form trực tuyến đã kiểm chứng.
+- Bản trước đã kiểm thử viewport mobile 390x844 và menu Escape; CSS thẻ giá chuyển 2 cột ở 1100px và 1 cột ở 560px. Chưa chạy lại thao tác gửi form trên thiết bị di động thật cho bản này.
+- Nhãn input/select đầy đủ, focus bàn phím, trạng thái gửi có aria-live, checkbox đồng ý bắt buộc; chưa chứng nhận WCAG.
+- HTTPS, tiêu đề vi, H1, canonical và chính sách bảo mật có mặt. SITE_INDEXABLE hiện giữ false (noindex); chưa bật index tìm kiếm.
+- Chưa chạy Lighthouse hoặc diễn tập khôi phục backup. Không có analytics, tự gửi tin Zalo, SMS hay gọi điện tự động.

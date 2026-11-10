@@ -1,8 +1,10 @@
-# Internet VNPT Bình Thủy — Landing page nhận nhu cầu tư vấn
+# Internet VNPT Bình Thủy — Landing page tư vấn
 
-Next.js 15.5.29 / React 19 / TypeScript / Node 24.x. Thiết kế theo bản tham chiếu xanh–trắng; 7 phần và 4 ảnh minh họa riêng. Số liên hệ 08.1800 6881.
+Next.js 15.5.29 / React 19 / TypeScript / Node 24.x. Website: https://internet.vnptcantho.io.vn/
 
-## Chạy
+Form đã hoạt động thực tế: chọn một trong bốn gói cước hoặc nhu cầu khác, điền liên hệ và đồng ý tư vấn → API Next.js → đầu nhận Supabase → RPC giao dịch → bản ghi vnpt_leads. Chỉ xác nhận thành công sau khi database nhận dữ liệu.
+
+## Chạy và kiểm thử
 
 ```bash
 npm ci
@@ -11,31 +13,32 @@ npm run lint
 npm run typecheck
 npm test
 npm run build
-npm start
 ```
 
-## Kích hoạt dữ liệu thật
+## Triển khai
 
-1. Chọn một project Supabase do chủ tài khoản quản lý.
-2. Chạy supabase/001_leads.sql. Bảng vnpt_leads bật RLS; anon/authenticated không có quyền đọc, ghi hay gọi RPC; chỉ service_role phía server thao tác được.
-3. Trong /etc/vnpt-fiber.env trên VPS (quyền 600), thêm SUPABASE_URL, SUPABASE_SECRET_KEY (secret), LEAD_IP_HASH_SECRET (secret ngẫu nhiên ít nhất 32 ký tự). Không đặt service role trong NEXT_PUBLIC_*, mã nguồn hay trình duyệt.
-4. Có thể bật Cloudflare Turnstile bằng cả NEXT_PUBLIC_TURNSTILE_SITE_KEY và TURNSTILE_SECRET_KEY; nếu chỉ cấu hình một khóa, form không được kích hoạt. Khi chưa dùng Turnstile, vẫn có rate limit, honeypot, thời gian tối thiểu và giới hạn payload.
-5. Cấu hình SITE_URL là URL Production chuẩn, SITE_INDEXABLE=true sau khi kiểm thử và xác nhận nội dung. Trước đó robots giữ noindex/disallow.
-6. Deploy và kiểm thử form bằng dữ liệu giả; xác nhận hàng trong Supabase, kiểm tra gửi lặp không tạo bản ghi mới; xóa riêng dữ liệu thử.
-7. Đọc/chăm sóc/xuất CSV ở Supabase Dashboard > Table Editor > vnpt_leads, bằng tài khoản được cấp quyền. Không có endpoint công khai liệt kê khách hàng.
+Ứng dụng trong thư mục vnpt-fiber, nhánh vnpt-fiber của repository khaivo73/landingpage-ntk. Giữ nguyên dự án NTK ở root. GitHub Actions đóng gói standalone; VPS chạy service systemd vnpt-fiber bằng user riêng, cổng loopback 3100. Apache dùng virtual host riêng internet.vnptcantho.io.vn; không thay website WordPress vnptcantho.io.vn.
 
-## Luồng nhận khách
+Bản runtime đang chạy: b35fcb8bfa81bd4191e5e97ae115827a5c04978e. Xem deploy/README.md và TEST-REPORT.md.
 
-Form POST /api/leads → kiểm tra cấu hình, Origin, kiểu/nội dung JSON (tối đa 8 KiB, đọc stream có giới hạn), consent, số điện thoại, khu vực, UUID và thời gian → xác minh Turnstile nếu cấu hình → HMAC địa chỉ IP → RPC transactional Supabase → chỉ trả thành công khi database xác nhận.
+## Cấu hình dữ liệu
 
-RPC giới hạn 5 đăng ký/IP băm/15 phút với advisory transaction lock; UUID là idempotency key cho retry. Mã băm không phải địa chỉ IP thô. UTM được giới hạn độ dài; referrer chỉ lưu hostname. Không log nội dung đăng ký/credentials. Chưa cấu hình database: API trả 503 và form bị khóa với hướng dẫn gọi tư vấn, không giả báo gửi thành công.
+- Project Supabase: sktvegipvzngwsditzjx (Singapore).
+- File /etc/vnpt-fiber.env trên VPS, root:root quyền 600: SUPABASE_URL, LEAD_INTAKE_KEY, LEAD_IP_HASH_SECRET, SITE_URL. Không dùng NEXT_PUBLIC_ cho các khóa máy chủ.
+- Edge Function supabase/functions/vnpt-lead-intake xác thực khóa máy chủ bằng digest, giới hạn payload và gọi đúng RPC. verify_jwt=false vì function tự xác thực bằng khóa riêng; không mở endpoint không xác thực.
+- Digest trong source không phải khóa gốc. Khi xoay khóa: tạo khóa ngẫu nhiên mới, cập nhật digest và deploy function, cập nhật file môi trường VPS, restart service, kiểm thử trước khi nhận khách.
+- RLS bật; anon/authenticated bị thu hồi quyền đọc/ghi/gọi RPC. Khóa quản trị được lấy từ biến môi trường sẵn có của Supabase ở function, không đưa lên VPS bằng phương án này.
+- Có thể cấu hình cả cặp NEXT_PUBLIC_TURNSTILE_SITE_KEY + TURNSTILE_SECRET_KEY. Hiện dùng rate limit database, honeypot, thời gian tối thiểu và body cap.
+- Kiểu cũ SUPABASE_SECRET_KEY hoặc SUPABASE_SERVICE_ROLE_KEY vẫn được hỗ trợ nếu không có LEAD_INTAKE_KEY.
 
-## Hosting
+## Chăm sóc khách hàng
 
-VPS Ubuntu 22.04 hiện có Apache và WordPress tại vnptcantho.io.vn. Landing page chạy bằng Next.js standalone ở 127.0.0.1:3100, systemd với user riêng; Apache reverse proxy bằng virtual host riêng. Không thay cấu hình website cũ. Xem deploy/README.md.
+Quản trị viên đăng nhập Supabase Dashboard, mở Table Editor → vnpt_leads; lọc status=new để xem khách mới. Trường demand chứa gói/nhu cầu đã chọn. Có thể cập nhật status, assigned_to và note để theo dõi. Không có thông báo hay tin nhắn tự động trong bản này.
 
-Mã ứng dụng độc lập trong thư mục vnpt-fiber, nhánh vnpt-fiber của repository đã kết nối. Giá/gói/ưu đãi chưa được xác minh nên không tự công bố. Ảnh là minh họa.
+Các dòng utm_source=system_qa là dữ liệu thử, đã đánh dấu closed và KHÔNG LIÊN HỆ.
 
-## Vận hành
+## Nội dung và vận hành
 
-Rà soát quyền người quản trị, thiết lập sao lưu và thời gian lưu dữ liệu; chính sách dự kiến cần được chủ trang xác nhận trước khi chạy quảng cáo. Supabase Free có thể pause khi ít hoạt động, không tương đương một cam kết dịch vụ liên tục. Bản này chưa gắn analytics, quảng cáo, Zalo OA hay gửi tin nhắn tự động.
+Giá và quyền lợi bốn gói theo ảnh chủ website cung cấp; CAM MẬT đã được chủ website xác nhận tên. VAT, điều kiện áp dụng, phí và ưu đãi cần được xác nhận khi tư vấn. Ảnh trang là minh họa.
+
+SITE_INDEXABLE vẫn false; cần rà soát cấu hình robots/sitemap trước khi bật index Production. Supabase Free có thể pause khi ít hoạt động. Quản trị viên cần thiết lập sao lưu và rà soát thời gian lưu dữ liệu. Không log dữ liệu liên hệ hoặc khóa kết nối.
