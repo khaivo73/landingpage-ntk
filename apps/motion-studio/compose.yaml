@@ -1,0 +1,14 @@
+services:
+  motion-studio:
+    build: .
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      APP_PASSWORD: ${APP_PASSWORD:?Set APP_PASSWORD with at least 12 characters}
+    volumes:
+      - motion-data:/app/data
+    shm_size: 512mb
+    init: true
+    restart: unless-stopped
+volumes:
+  motion-data:
