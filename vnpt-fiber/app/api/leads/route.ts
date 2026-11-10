@@ -74,14 +74,15 @@ export async function POST(request: NextRequest) {
     .digest("hex");
   try {
     const response = await fetch(
-      `${process.env.SUPABASE_URL}/rest/v1/rpc/submit_vnpt_lead`,
+      process.env.LEAD_INTAKE_KEY
+        ? `${process.env.SUPABASE_URL}/functions/v1/vnpt-lead-intake`
+        : `${process.env.SUPABASE_URL}/rest/v1/rpc/submit_vnpt_lead`,
       {
         method: "POST",
         headers: {
-          apikey: supabaseServerKey()!,
-          ...(supabaseServerKey()!.startsWith("sb_secret_")
-            ? {}
-            : { Authorization: `Bearer ${supabaseServerKey()}` }),
+          ...(process.env.LEAD_INTAKE_KEY
+            ? { "X-VNPT-Intake-Key": process.env.LEAD_INTAKE_KEY }
+            : { apikey: supabaseServerKey()!, ...(supabaseServerKey()!.startsWith("sb_secret_") ? {} : { Authorization: `Bearer ${supabaseServerKey()}` }) }),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

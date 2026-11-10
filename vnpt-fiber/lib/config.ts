@@ -5,7 +5,7 @@ export function supabaseServerKey() {
 export function leadServiceReady() {
   const base = Boolean(
     process.env.SUPABASE_URL?.startsWith("https://") &&
-    supabaseServerKey() &&
+    (supabaseServerKey() || (process.env.LEAD_INTAKE_KEY?.length ?? 0) >= 64) &&
     (process.env.LEAD_IP_HASH_SECRET?.length ?? 0) >= 32,
   );
   const captcha =
