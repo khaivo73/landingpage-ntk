@@ -28,12 +28,12 @@ Còn thiếu: cấp quyền chuyển khóa server Supabase đến VPS, kiểm th
 
 ## Bổ sung 4 gói cước — 10/11/2026
 
-Nguồn nội dung: ảnh tờ giới thiệu VNPT Cần Thơ do chủ website cung cấp trong hội thoại. HOME1 Mesh 215.000đ/tháng, CAM CANH 200.000đ/tháng, CAM MẮT 190.000đ/tháng, CAM SÀNH 205.000đ/tháng. Không tự thêm khuyến mãi/VAT/điều kiện chưa xác minh.
+Nguồn nội dung: ảnh tờ giới thiệu VNPT Cần Thơ do chủ website cung cấp trong hội thoại. HOME1 Mesh 215.000đ/tháng, CAM CANH 200.000đ/tháng, CAM MẬT 190.000đ/tháng, CAM SÀNH 205.000đ/tháng. Không tự thêm khuyến mãi/VAT/điều kiện chưa xác minh.
 
 - Thêm thẻ giá và quyền lợi, nút Chọn gói, trạng thái gói đã chọn và chọn sẵn trường Gói cước / nhu cầu. Cùng trạng thái React cho thẻ và form.
 - Lựa chọn gửi qua trường demand hiện có và được API chuyển vào payload Supabase; không cần thay schema.
 - Lint, typecheck, production build PASS; 13/13 unit tests PASS, gồm chấp nhận 4 tên gói và từ chối tên lạ.
-- Chromium preview desktop 1363px: 4 thẻ, không tràn ngang; chọn HOME1 Mesh, CAM CANH, CAM MẮT bằng chuột và CAM SÀNH bằng Enter xác nhận trường demand và thẻ được chọn đúng. Chỉ 1 thẻ được đánh dấu tại một thời điểm.
+- Chromium preview desktop 1363px: 4 thẻ, không tràn ngang; chọn HOME1 Mesh, CAM CANH, CAM MẬT bằng chuột và CAM SÀNH bằng Enter xác nhận trường demand và thẻ được chọn đúng. Chỉ 1 thẻ được đánh dấu tại một thời điểm.
 - CSS đặt 2 cột dưới 1100px và 1 cột dưới 560px; chưa kiểm thử lại viewport mobile cho lần cập nhật này.
 - Bản gói cước chưa lên VPS; cần thực thi installer của release mới qua SSH. Form production vẫn chờ cấu hình secret; không tuyên bố end-to-end thành công.
 - deploy/activate-leads.sh hỗ trợ quản trị viên nhập khóa server qua SSH với input ẩn, xác thực API quyền đọc limit=0 trước khi ghi file quyền 600; không đưa secret vào command arguments hay Git.
