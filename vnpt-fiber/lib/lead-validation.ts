@@ -5,12 +5,25 @@ export const WARDS = [
   "Phước Thới",
   "Khu vực khác",
 ] as const;
+// Prices and inclusions transcribed from the owner's supplied VNPT Cần Thơ leaflet.
+// Tax, eligibility, installation fees and promotion validity are not specified.
+export const PACKAGES = [
+  { id: "home1-mesh", name: "HOME1 Mesh", price: 215000,
+    features: ["Tốc độ WiFi 300 Mbps", "Family Safe và Green Net", "01 thiết bị WiFi Mesh 6"] },
+  { id: "cam-canh", name: "CAM CANH", price: 200000,
+    features: ["Tốc độ WiFi 300 Mbps", "01 camera Indoor", "Lưu trữ cloud 3 ngày"] },
+  { id: "cam-mat", name: "CAM MẮT", price: 190000,
+    features: ["Tốc độ WiFi 300 Mbps", "Truyền hình MyTV (app)", "01 camera Indoor · cloud 1 ngày"] },
+  { id: "cam-sanh", name: "CAM SÀNH", price: 205000,
+    features: ["Tốc độ WiFi 300 Mbps", "Truyền hình MyTV (app)", "01 camera Indoor · cloud 1 ngày", "01 thiết bị WiFi Mesh"] },
+] as const;
 export const DEMANDS = [
   "Internet gia đình",
   "Làm việc tại nhà",
   "Cửa hàng / hộ kinh doanh",
   "Internet + WiFi Mesh",
   "Cần tư vấn thêm",
+  ...PACKAGES.map((p) => p.name),
 ] as const;
 export type Lead = {
   fullName: string;

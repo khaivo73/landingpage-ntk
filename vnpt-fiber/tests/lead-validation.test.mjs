@@ -54,3 +54,11 @@ test("rejects malformed or overlong names and addresses", () => {
     validateLead({ ...sample(), address: "x".repeat(201) }, now).errors.address,
   );
 });
+
+test("accepts each advertised package and retains choice for database persistence", () => {
+  for (const demand of ["HOME1 Mesh", "CAM CANH", "CAM MẮT", "CAM SÀNH"]) {
+    const result = validateLead({ ...sample(), demand }, now);
+    assert.equal(result.lead?.demand, demand);
+  }
+  assert.ok(validateLead({ ...sample(), demand: "Gói không tồn tại" }, now).errors.demand);
+});

@@ -9,7 +9,8 @@ import {
   LockKeyhole,
   Phone,
 } from "lucide-react";
-import { WARDS, DEMANDS } from "@/lib/lead-validation";
+import { usePackageSelection } from "@/components/package-selection";
+import { WARDS, DEMANDS, PACKAGES } from "@/lib/lead-validation";
 type Turnstile = {
   render: (el: HTMLElement, opts: Record<string, unknown>) => string;
   reset: (id: string) => void;
@@ -21,6 +22,7 @@ declare global {
   }
 }
 export function LeadForm({ enabled }: { enabled: boolean }) {
+  const { demand, setDemand } = usePackageSelection();
   const [ready, setReady] = useState(false),
     [sending, setSending] = useState(false),
     [message, setMessage] = useState(""),
@@ -116,6 +118,7 @@ export function LeadForm({ enabled }: { enabled: boolean }) {
       if (response.ok) {
         setSuccess(true);
         form.reset();
+        setDemand("");
         requestId.current = crypto.randomUUID();
         started.current = Date.now();
       } else {
@@ -142,6 +145,9 @@ export function LeadForm({ enabled }: { enabled: boolean }) {
           kiểm tra địa chỉ.
         </p>
       </div>
+      {PACKAGES.some((p) => p.name === demand) && (
+        <p className="package-selection-note" role="status">Gói đã chọn: <strong>{demand}</strong>. Lựa chọn chỉ được gửi khi bạn hoàn tất form và nhận xác nhận thành công.</p>
+      )}
       {!enabled && (
         <div className="form-unavailable" role="note">
           <strong>Đăng ký online đang chờ kích hoạt.</strong>
@@ -210,11 +216,12 @@ export function LeadForm({ enabled }: { enabled: boolean }) {
             </select>
           </label>
           <label htmlFor="demand">
-            Nhu cầu sử dụng <span>*</span>
+            Gói cước / nhu cầu <span>*</span>
             <select
               id="demand"
               required
-              defaultValue=""
+              value={demand}
+              onChange={(e) => setDemand(e.target.value)}
               aria-invalid={!!errors.demand}
             >
               <option value="" disabled>

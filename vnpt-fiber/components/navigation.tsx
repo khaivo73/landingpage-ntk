@@ -40,6 +40,7 @@ export function Navigation() {
             aria-label="Điều hướng chính"
           >
             {[
+              ["#goi-cuoc", "Gói cước"],
               ["#giai-phap", "Giải pháp"],
               ["#wifi-mesh", "WiFi Mesh"],
               ["#lap-dat", "Lắp đặt"],

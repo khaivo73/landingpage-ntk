@@ -20,6 +20,8 @@ import {
   Router,
 } from "lucide-react";
 import { Navigation } from "@/components/navigation";
+import { Packages } from "@/components/packages";
+import { PackageSelectionProvider } from "@/components/package-selection";
 import { LeadForm } from "@/components/lead-form";
 import { leadServiceReady } from "@/lib/config";
 export const dynamic = "force-dynamic";
@@ -87,7 +89,7 @@ const faqs = [
 export default function Home() {
   const enabled = leadServiceReady();
   return (
-    <>
+    <PackageSelectionProvider>
       <Navigation />
       <main id="noi-dung" tabIndex={-1}>
         <section className="hero" aria-labelledby="hero-title">
@@ -121,8 +123,8 @@ export default function Home() {
               <a className="button primary" href="#dang-ky">
                 Đăng ký tư vấn <ArrowRight size={19} />
               </a>
-              <a className="button outline" href="#giai-phap">
-                Khám phá giải pháp <ArrowUpRight size={18} />
+              <a className="button outline" href="#goi-cuoc">
+                Xem 4 gói cước <ArrowUpRight size={18} />
               </a>
             </div>
             <div className="hero-local">
@@ -150,6 +152,7 @@ export default function Home() {
             })}
           </div>
         </section>
+        <Packages />
         <section
           id="giai-phap"
           className="section solutions"
@@ -428,6 +431,6 @@ export default function Home() {
           Đăng ký tư vấn <ArrowRight size={18} />
         </a>
       </div>
-    </>
+    </PackageSelectionProvider>
   );
 }

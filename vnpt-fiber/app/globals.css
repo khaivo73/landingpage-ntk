@@ -1559,3 +1559,22 @@ select:focus-visible {
   }
 }
 @media(min-width:761px){.nav-links .mobile-consult{display:none}}
+
+/* Package comparison: source is the owner's supplied VNPT Cần Thơ leaflet. */
+.packages-section { background: var(--ice); }
+.package-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 18px; }
+.package-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 22px; display: flex; flex-direction: column; min-width: 0; }
+.package-card.selected { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue); }
+.package-icon { color: var(--blue); background: var(--ice); border-radius: 12px; padding: 12px; width: fit-content; }
+.package-card h3 { font-size: 22px; margin: 22px 0 14px; }
+.package-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px; color: var(--muted); margin: 0 0 22px; }
+.package-price strong { color: var(--navy); font-size: clamp(26px,2.5vw,34px); letter-spacing: -1px; }
+.package-price strong span { font-size: 20px; letter-spacing: 0; }
+.package-card ul { list-style: none; padding: 0; margin: 0 0 26px; flex: 1; }
+.package-card li { display: flex; gap: 9px; margin: 0 0 13px; font-size: 14px; line-height: 1.6; }
+.package-card li svg { color: var(--blue); flex-shrink: 0; margin-top: 3px; }
+.package-card button { width: 100%; }
+.package-terms { max-width: 930px; margin: 26px auto 0; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.package-selection-note { padding: 14px; background: var(--ice); border-radius: 10px; color: var(--navy); font-size: 14px; line-height: 1.6; }
+@media (max-width: 1100px) { .package-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 560px) { .package-grid { grid-template-columns: minmax(0,1fr); } .package-card { padding: 24px; } }
