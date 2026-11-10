@@ -1,0 +1,23 @@
+import {test,after} from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtemp,rm,readFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import {once} from 'node:events';
+import {execFileSync} from 'node:child_process';
+const dir=await mkdtemp(path.join(tmpdir(),'motion-test-'));process.env.DATA_DIR=dir;process.env.PORT='0';
+const {server}=await import('../server.mjs');if(!server.listening)await once(server,'listening');const origin=`http://127.0.0.1:${server.address().port}`;
+after(async()=>{await new Promise(r=>server.close(r));await rm(dir,{recursive:true,force:true})});
+const req=async(url,method='GET',data)=>{const res=await fetch(origin+url,{method,headers:{'Content-Type':'application/json'},...(data?{body:JSON.stringify(data)}:{})});return {status:res.status,data:await res.json()}};
+const demo=(await req('/api/demo')).data;
+test('project CRUD persists edits and archives without deleting',async()=>{const saved=await req('/api/projects','POST',demo);assert.equal(saved.status,201);const id=saved.data.id;const changed=await req('/api/projects/'+id,'PUT',{...demo,name:'Đã sửa'});assert.equal(changed.data.name,'Đã sửa');assert.equal((await req('/api/projects')).data.length,1);await req('/api/projects/'+id,'DELETE');assert.equal((await req('/api/projects')).data.length,0);assert.equal((await req('/api/projects/'+id)).data.archived,true)});
+test('rejects cross-origin writes, unsafe paths, missing assets and malformed JSON',async()=>{const r=await fetch(origin+'/api/projects',{method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},body:JSON.stringify(demo)});assert.equal(r.status,403);assert.equal((await req('/api/projects/not-an-id')).status,400);assert.equal((await req('/api/projects','POST',{...demo,audio:'/assets/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.mp3'})).status,400);assert.equal((await fetch(origin+'/api/projects',{method:'POST',body:'{'})).status,400);assert.equal((await req('/api/jobs/does-not-exist')).status,404)});
+test('rejects spoofed image uploads',async()=>{const r=await fetch(origin+'/api/assets',{method:'POST',headers:{'Content-Type':'image/png'},body:'not an image'});assert.equal(r.status,400)});
+test('exports real MP4 with uploaded image and audio and supports byte ranges',{skip:!process.env.RENDER_TEST,timeout:180000},async()=>{
+const image=path.join(dir,'test.png'),audio=path.join(dir,'test.wav');
+execFileSync('ffmpeg',['-v','error','-y','-f','lavfi','-i','color=c=lime:s=100x100','-frames:v','1','-threads','1',image]);execFileSync('ffmpeg',['-v','error','-y','-f','lavfi','-i','sine=frequency=440:duration=1',audio]);
+const upload=async(file,type)=>{const r=await fetch(origin+'/api/assets',{method:'POST',headers:{'Content-Type':type},body:await readFile(file)});const data=await r.json();assert.equal(r.status,201,JSON.stringify(data));return data.url};
+const p={...demo,format:'square',fps:24,audio:await upload(audio,'audio/wav'),scenes:[{...demo.scenes[0],duration:1,image:await upload(image,'image/png')}]};const start=await req('/api/jobs','POST',p);assert.equal(start.status,202);let job;
+for(let i=0;i<900;i++){job=(await req('/api/jobs/'+start.data.id)).data;if(['done','error','cancelled'].includes(job.status))break;await new Promise(r=>setTimeout(r,100))}assert.equal(job.status,'done',job.message);assert.equal(job.report.frames,24);assert.equal(job.report.hasAudio,true);assert.equal(job.report.width,1080);assert.equal(job.report.duration,1);
+const r=await fetch(origin+job.url,{headers:{Range:'bytes=0-99'}});assert.equal(r.status,206);assert.equal((await r.arrayBuffer()).byteLength,100);assert.equal((await fetch(origin+job.report.scenes[0])).status,200);
+});
