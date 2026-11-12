@@ -218,7 +218,7 @@ select:focus-visible {
 .brand-location > span {
   display: block;
   font-size: 14px;
-  color: #667b94;
+  color: #52677f;
 }
 .nav-links {
   display: flex;
@@ -348,7 +348,7 @@ select:focus-visible {
   font-size: 14px;
   color: #fff;
   text-shadow: 0 1px 4px #000;
-  background: #001c3f50;
+  background: #001c3fd9;
   padding: 4px 8px;
   border-radius: 4px;
 }
@@ -441,7 +441,7 @@ select:focus-visible {
 }
 .card-title > span {
   font-size: 14px;
-  color: #7186a2;
+  color: #52677f;
   letter-spacing: 2px;
   font-weight: 700;
 }
@@ -812,7 +812,7 @@ select:focus-visible {
   line-height: 1.3;
 }
 .lead-form input::placeholder {
-  color: #697c94;
+  color: #52677f;
 }
 .lead-form fieldset:disabled {
   opacity: 0.6;
@@ -964,7 +964,7 @@ select:focus-visible {
   margin-top: 30px;
   padding-top: 21px;
   font-size: 14px;
-  color: #687b92;
+  color: #52677f;
   line-height: 1.7;
 }
 .mobile-break {
