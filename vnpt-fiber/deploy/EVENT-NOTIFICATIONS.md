@@ -20,7 +20,9 @@ Google Sheets receives authenticated HTTPS POST events through the owner's Apps 
 
 ## Release status
 
-Prepared and unit-tested; production event cutover is pending the owner's Google web app deployment approval. The existing production notification path is retained until cutover.
+Production cutover completed on 2026-11-12 using runtime revision 544216bc70e6a23eb98101547232fa37cab56cc4. The authenticated Sheets webhook passed its readiness check. The directory watcher and local recovery timer are active; the previous network polling timer is inactive and the previous Apps Script time trigger has been removed.
+
+Live verification: a labelled test submission returned HTTP 200, reached Telegram, email and Google Sheets on their first attempts, and left no event markers. A duplicate request with the same UUID returned HTTP 200 and retained exactly one database record and one Sheet row. The email was independently found in the receiving inbox. Test records were marked closed after verification.
 
 Validation completed: 23 JavaScript tests, 11 Python tests, type checking and production build passed. Hosted transactional checks verified Google-channel claims, acknowledgement and pending-state calculations with rollback. Tests explicitly verify zero cloud calls while idle, durable recovery after failure, no wakeup before persistence completes, webhook authentication and prevention of unauthenticated Sheet writes.
 

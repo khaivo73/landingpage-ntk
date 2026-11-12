@@ -4,7 +4,7 @@ Body copy and form inputs use 16px. Supporting text uses at least 14px instead o
 
 Muted labels that measured below 4.5:1 against white were darkened to #52677f (approximately 5.82:1). Image-caption backgrounds were darkened for legibility. This is a focused typography review, not a claim of full accessibility certification.
 
-The first deployed revision was checked in the connected desktop browser at its actual approximately 1920px viewport. Visible paragraph/list/label/note/button elements below 14px: zero. Visible form inputs/selects: 16px. No document-wide horizontal overflow was observed.
+The final deployed revision 544216bc70e6a23eb98101547232fa37cab56cc4 was checked in the connected desktop browser at its actual 1905px content viewport. Visible paragraph/list/label/note/button elements below 14px: zero. Text form inputs/selects: 16px. Document width and scroll width both measured 1905px, with no document-wide horizontal overflow. The final hero screenshot was visually reviewed.
 
 Responsive CSS was reviewed for 320px, 390px and tablet breakpoints. Automated mobile rendering could not be verified in this session: the connected browser's viewport override did not alter its actual viewport; an isolated local test browser was blocked by the execution environment. No real-device mobile test is claimed.
 
