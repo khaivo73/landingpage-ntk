@@ -1,5 +1,5 @@
 // Google Sheets queue only. This credential cannot claim Telegram/email jobs.
-const EXPECTED_HASH = "96d3a59808c7cec5af966cf362475c19be57c3943c9b98ed1d95cfa64d3dd0ec";
+const EXPECTED_HASH = "6c4cfb19e20906fa87087865827b3cf9cfd755efe9aa786ac06de85520d2591f";
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), {
   status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
 });
