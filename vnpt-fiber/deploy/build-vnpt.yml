@@ -1,0 +1,44 @@
+name: VNPT standalone release
+on:
+  push:
+    branches: [vnpt-fiber]
+    paths: ['vnpt-fiber/**', '.github/workflows/build-vnpt.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: vnpt-runtime-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: vnpt-fiber
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: vnpt-fiber/package-lock.json
+      - run: npm ci
+      - run: npm run lint && npm run typecheck && npm test
+      - run: python3 -m unittest discover -s tests -p 'test_*.py'
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm run build
+      - name: Package runtime without credentials
+        run: |
+          test -f .next/standalone/server.js
+          cp -r public .next/standalone/public
+          mkdir -p .next/standalone/.next/static
+          cp -r .next/static/. .next/standalone/.next/static/
+          node -p 'process.version' > .next/standalone/NODE_VERSION
+          printf '%s\n' "$GITHUB_SHA" > .next/standalone/COMMIT
+          tar -C .next/standalone -czf vnpt-runtime.tar.gz .
+          sha256sum vnpt-runtime.tar.gz > vnpt-runtime.sha256
+      - name: Publish runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "vnpt-build-$GITHUB_SHA" vnpt-runtime.tar.gz vnpt-runtime.sha256 --target "$GITHUB_SHA" --title "VNPT runtime $GITHUB_SHA" --notes 'Standalone runtime. No database credentials. Built and tested in GitHub Actions.'

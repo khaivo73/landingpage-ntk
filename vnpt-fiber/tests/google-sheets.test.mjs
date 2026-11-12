@@ -11,7 +11,7 @@ const job={lead_id:'7942e6f7-ea71-4c56-8f24-100000000003',created_at:'2026-11-12
 function sheetMock(initial=[]) {
   const rows=[...initial];
   return {rows,writes:0,getLastRow:()=>rows.length+1,getMaxRows:()=>1000,
-    getRange(row,col,count,width){ return {
+    getRange(){ return {
       getDisplayValues:()=>rows.map(r=>[r[0]]),setNumberFormat(){return this;},setDataValidation(){return this;},
       setValues(values){rows.push(values[0]);sheet.writes++;return this;}
     };}

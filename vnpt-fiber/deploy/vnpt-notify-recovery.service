@@ -1,0 +1,14 @@
+[Unit]
+Description=Promote due VNPT retry flags (local filesystem only)
+
+[Service]
+Type=oneshot
+User=vnpt-notify
+Group=vnpt-notify
+SupplementaryGroups=vnpt-events
+Environment=VNPT_EVENTS_DIR=/var/lib/vnpt-events
+ExecStart=/usr/bin/python3 /opt/vnpt-notify/event-spool.py
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/vnpt-events

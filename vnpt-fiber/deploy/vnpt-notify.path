@@ -1,0 +1,9 @@
+[Unit]
+Description=Wake VNPT notifications only when a form event exists
+
+[Path]
+DirectoryNotEmpty=/var/lib/vnpt-events/ready
+Unit=vnpt-notify.service
+
+[Install]
+WantedBy=multi-user.target

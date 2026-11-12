@@ -24,6 +24,7 @@ jobs:
           cache-dependency-path: vnpt-fiber/package-lock.json
       - run: npm ci
       - run: npm run lint && npm run typecheck && npm test
+      - run: python3 -m unittest discover -s tests -p 'test_*.py'
       - run: npm audit --omit=dev --audit-level=high
       - run: npm run build
       - name: Package runtime without credentials

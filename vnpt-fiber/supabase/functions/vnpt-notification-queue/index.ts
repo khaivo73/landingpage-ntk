@@ -31,8 +31,8 @@ Deno.serve(async (req: Request) => {
     const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     let rpc: string;
     let payload: Record<string, unknown>;
-    if (b.action === "claim" && Array.isArray(b.channels) && b.channels.length > 0 && b.channels.length <= 2 && b.channels.every((c: unknown) => c === "telegram" || c === "email")) {
-      rpc = "claim_vnpt_notification"; payload = { p_channels: b.channels };
+    if ((b.action === "claim" || b.action === "state") && Array.isArray(b.channels) && b.channels.length > 0 && b.channels.length <= 3 && b.channels.every((c: unknown) => c === "telegram" || c === "email" || c === "google_sheets")) {
+      rpc = b.action === "state" ? "vnpt_notification_pending_state" : "claim_vnpt_notification"; payload = { p_channels: b.channels };
     } else if (b.action === "finish" && typeof b.id === "string" && uuid.test(b.id) && typeof b.lease_id === "string" && uuid.test(b.lease_id) && typeof b.success === "boolean") {
       const allowed = ["DELIVERY_FAILED", "TELEGRAM_FAILED", "EMAIL_FAILED", "RATE_LIMIT"];
       rpc = "finish_vnpt_notification";

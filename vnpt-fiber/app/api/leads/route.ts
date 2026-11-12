@@ -3,6 +3,7 @@ import { createHmac } from "node:crypto";
 import { validateLead } from "@/lib/lead-validation";
 import { leadServiceReady, supabaseServerKey } from "@/lib/config";
 import { readSmallJson, InputError } from "@/lib/read-json";
+import { prepareLeadEvent, activateLeadEvent } from "@/lib/lead-events";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const reply = (data: unknown, status = 200) =>
@@ -72,7 +73,10 @@ export async function POST(request: NextRequest) {
   const ipHash = createHmac("sha256", process.env.LEAD_IP_HASH_SECRET!)
     .update(ip)
     .digest("hex");
+  let event: Awaited<ReturnType<typeof prepareLeadEvent>> = null;
   try {
+    // Do not acknowledge persistence unless a recovery marker can be created.
+    event = await prepareLeadEvent(lead.requestId);
     const response = await fetch(
       process.env.LEAD_INTAKE_KEY
         ? `${process.env.SUPABASE_URL}/functions/v1/vnpt-lead-intake`
@@ -134,5 +138,10 @@ export async function POST(request: NextRequest) {
       },
       503,
     );
+  } finally {
+    // Timeouts are uncertain: the database may have committed. The worker safely
+    // checks the outbox; abandoned pending markers are recovered locally.
+    try { await activateLeadEvent(event); }
+    catch { console.error('Lead event activation deferred to local recovery'); }
   }
 }
